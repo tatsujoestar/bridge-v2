@@ -5,49 +5,49 @@ import {
   Tooltip,
   Typography,
   useTheme,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import { Skeleton } from "@material-ui/lab";
-import { RenNetwork } from "@renproject/interfaces";
-import { GatewaySession, OpenedGatewaySession } from "@renproject/ren-tx";
+} from '@material-ui/core'
+import { makeStyles } from '@material-ui/core/styles'
+import { Skeleton } from '@material-ui/lab'
+import { RenNetwork } from '@renproject/interfaces'
+import { GatewaySession, OpenedGatewaySession } from '@renproject/ren-tx'
 import React, {
   FunctionComponent,
   useCallback,
   useEffect,
   useMemo,
   useState,
-} from "react";
-import { useTranslation } from "react-i18next";
-import { useDispatch, useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
+} from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 import {
   ActionButton,
   ActionButtonWrapper,
   SmallActionButton,
-} from "../../components/buttons/Buttons";
-import { AssetDropdown } from "../../components/dropdowns/AssetDropdown";
-import { BlockIcon } from "../../components/icons/RenIcons";
+} from '../../components/buttons/Buttons'
+import { AssetDropdown } from '../../components/dropdowns/AssetDropdown'
+import { BlockIcon } from '../../components/icons/RenIcons'
 import {
   BigTopWrapper,
   BigWrapper,
   CenteringSpacedBox,
   Hide,
   MediumWrapper,
-} from "../../components/layout/LayoutHelpers";
-import { Link } from "../../components/links/Links";
+} from '../../components/layout/LayoutHelpers'
+import { Link } from '../../components/links/Links'
 import {
   SimplePagination,
   SimplestPagination,
-} from "../../components/pagination/SimplePagination";
-import { PulseIndicator } from "../../components/progress/ProgressHelpers";
+} from '../../components/pagination/SimplePagination'
+import { PulseIndicator } from '../../components/progress/ProgressHelpers'
 import {
   TransactionsHeader,
   TransactionsPaginationWrapper,
-} from "../../components/transactions/TransactionsGrid";
-import { Debug } from "../../components/utils/Debug";
-import { WalletConnectionProgress } from "../../components/wallet/WalletHelpers";
-import { featureFlags } from "../../constants/featureFlags";
-import { paths } from "../../pages/routes";
+} from '../../components/transactions/TransactionsGrid'
+import { Debug } from '../../components/utils/Debug'
+import { WalletConnectionProgress } from '../../components/wallet/WalletHelpers'
+import { featureFlags } from '../../constants/featureFlags'
+import { paths } from '../../pages/routes'
 import {
   BridgeChain,
   BridgeCurrency,
@@ -55,132 +55,130 @@ import {
   supportedLockCurrencies,
   supportedMintDestinationChains,
   toMintedCurrency,
-} from "../../utils/assetConfigs";
-import { getFormattedDateTime, getFormattedHMS } from "../../utils/dates";
+} from '../../utils/assetConfigs'
+import { getFormattedDateTime, getFormattedHMS } from '../../utils/dates'
 import {
   CircledProgressWithContent,
   getDepositStatusIcon,
-} from "../mint/components/MultipleDepositsHelpers";
+} from '../mint/components/MultipleDepositsHelpers'
 import {
   useDepositPagination,
   useIntervalCountdown,
   useMintMachine,
-} from "../mint/mintHooks";
-import { $mint, setMintCurrency } from "../mint/mintSlice";
+} from '../mint/mintHooks'
+import { $mint, setMintCurrency } from '../mint/mintSlice'
 import {
   areAllDepositsCompleted,
   createMintTransaction,
   getDepositParams,
   getLockAndMintBasicParams,
   getRemainingGatewayTime,
-} from "../mint/mintUtils";
-import { $renNetwork } from "../network/networkSlice";
-import { useSelectedChainWallet } from "../wallet/walletHooks";
+} from '../mint/mintUtils'
+import { $renNetwork } from '../network/networkSlice'
+import { useSelectedChainWallet } from '../wallet/walletHooks'
 import {
   $wallet,
   setChain,
   setWalletPickerOpened,
-} from "../wallet/walletSlice";
+} from '../wallet/walletSlice'
 import {
   ErrorChip,
   SuccessChip,
   TransactionHistoryDialog,
   WarningChip,
   WarningLabel,
-} from "./components/TransactionHistoryHelpers";
+} from './components/TransactionHistoryHelpers'
 import {
   $currentTxId,
   $txHistoryOpened,
   setTxHistoryOpened,
-} from "./transactionsSlice";
+} from './transactionsSlice'
 import {
   createTxQueryString,
   DepositEntryStatus,
   DepositPhase,
   GatewayStatus,
-} from "./transactionsUtils";
+} from './transactionsUtils'
 
 export const MintTransactionHistory: FunctionComponent = () => {
-  const { t } = useTranslation();
-  const dispatch = useDispatch();
-  const { chain } = useSelector($wallet);
-  const { walletConnected, account } = useSelectedChainWallet();
-  const { currency } = useSelector($mint);
-  const network = useSelector($renNetwork);
-  const opened = useSelector($txHistoryOpened);
-  const activeTxId = useSelector($currentTxId);
-  const [page, setPage] = useState(0);
+  const { t } = useTranslation()
+  const dispatch = useDispatch()
+  const { chain } = useSelector($wallet)
+  const { walletConnected, account } = useSelectedChainWallet()
+  const { currency } = useSelector($mint)
+  const network = useSelector($renNetwork)
+  const opened = useSelector($txHistoryOpened)
+  const activeTxId = useSelector($currentTxId)
+  const [page, setPage] = useState(0)
 
-  const [pending, setPending] = useState(false);
+  const [pending, setPending] = useState(false)
   useEffect(() => {
-    setPending(true);
+    setPending(true)
     setTimeout(() => {
-      setPending(false);
-    }, 1000);
-  }, [currency, chain, page]);
+      setPending(false)
+    }, 1000)
+  }, [currency, chain, page])
 
-  const chainConfig = getChainConfig(chain);
+  const chainConfig = getChainConfig(chain)
 
   const handleCurrencyChange = useCallback(
     (event) => {
-      setPage(0);
-      dispatch(setMintCurrency(event.target.value));
+      setPage(0)
+      dispatch(setMintCurrency(event.target.value))
     },
     [dispatch]
-  );
+  )
   const handleChainChange = useCallback(
     (event) => {
-      setPage(0);
-      dispatch(setChain(event.target.value));
+      setPage(0)
+      dispatch(setChain(event.target.value))
     },
     [dispatch]
-  );
+  )
 
   const handleChangePage = useCallback((event: unknown, newPage: number) => {
-    setPage(newPage);
-  }, []);
+    setPage(newPage)
+  }, [])
 
   const handleWalletPickerOpen = useCallback(() => {
-    dispatch(setWalletPickerOpened(true));
-  }, [dispatch]);
+    dispatch(setWalletPickerOpened(true))
+  }, [dispatch])
 
   const handleTxHistoryClose = useCallback(() => {
-    dispatch(setTxHistoryOpened(false));
-  }, [dispatch]);
+    dispatch(setTxHistoryOpened(false))
+  }, [dispatch])
 
-  const rowsPerPage = 3;
-  const startDay = rowsPerPage * page;
+  const rowsPerPage = 3
+  const startDay = rowsPerPage * page
   return (
     <TransactionHistoryDialog
       open={opened}
       onEscapeKeyDown={handleTxHistoryClose}
       onBackdropClick={handleTxHistoryClose}
     >
-      <TransactionsHeader title={t("history.header")}>
+      <TransactionsHeader title={t('history.header')}>
         <AssetDropdown
           condensed
-          assetLabel={t("common.asset-label")}
+          assetLabel={t('common.asset-label')}
           available={supportedLockCurrencies}
           value={currency}
-          onChange={handleCurrencyChange}
-        />
-        <Box mx={2}>{t("history.header-separator")}</Box>
+          onChange={handleCurrencyChange} label={''} mode={'chain'} balances={[]} blockchainLabel={''}        />
+        <Box mx={2}>{t('history.header-separator')}</Box>
         <AssetDropdown
-          mode="chain"
-          blockchainLabel={t("common.blockchain-label")}
+          mode='chain'
+          blockchainLabel={t('common.blockchain-label')}
           condensed
           available={supportedMintDestinationChains}
           value={chain}
-          onChange={handleChainChange}
-        />
+          onChange={handleChainChange} label={''} balances={[]} assetLabel={''}        />
       </TransactionsHeader>
       {!walletConnected && (
         <BigTopWrapper>
           {!walletConnected && (
             <>
               <MediumWrapper>
-                <Typography variant="body1" align="center">
-                  {t("history.please-connect-wallet", {
+                <Typography variant='body1' align='center'>
+                  {t('history.please-connect-wallet', {
                     chain: chainConfig.full,
                   })}
                 </Typography>
@@ -193,7 +191,7 @@ export const MintTransactionHistory: FunctionComponent = () => {
                 </MediumWrapper>
                 <ActionButtonWrapper>
                   <ActionButton onClick={handleWalletPickerOpen}>
-                    {t("wallet.connect")}
+                    {t('wallet.connect')}
                   </ActionButton>
                 </ActionButtonWrapper>
               </BigWrapper>
@@ -229,8 +227,8 @@ export const MintTransactionHistory: FunctionComponent = () => {
         </>
       )}
     </TransactionHistoryDialog>
-  );
-};
+  )
+}
 
 type GatewayResolverProps = {
   dayOffset: number;
@@ -240,7 +238,7 @@ type GatewayResolverProps = {
   network: RenNetwork;
   pending: boolean;
   activeTxId: string;
-};
+}
 
 const GatewayEntryResolver: FunctionComponent<GatewayResolverProps> = ({
   dayOffset,
@@ -254,26 +252,26 @@ const GatewayEntryResolver: FunctionComponent<GatewayResolverProps> = ({
   const tx = useMemo(
     () =>
       createMintTransaction({
-        currency: currency,
+        currency,
         destAddress: account,
         mintedCurrency: toMintedCurrency(currency),
         mintedCurrencyChain: chain,
         userAddress: account,
-        network: network,
-        dayOffset: dayOffset,
+        network,
+        dayOffset,
       }),
     [currency, account, chain, network, dayOffset]
-  );
+  )
 
-  const isActive = activeTxId === tx.id;
+  const isActive = activeTxId === tx.id
   if (isActive) {
-    return <GatewayEntry tx={tx} isActive />;
+    return <GatewayEntry tx={tx} isActive />
   }
   if (pending) {
-    return <GatewayEntry tx={tx} pending />;
+    return <GatewayEntry tx={tx} pending />
   }
-  return <GatewayEntryMachine tx={tx} />;
-};
+  return <GatewayEntryMachine tx={tx} />
+}
 
 export type GatewayEntryProps = {
   tx: GatewaySession<any>;
@@ -281,27 +279,27 @@ export type GatewayEntryProps = {
   pending?: boolean;
   isActive?: boolean;
   onContinue?: ((depositHash?: string) => void) | (() => void);
-};
+}
 
 export const GatewayEntryMachine: FunctionComponent<GatewayEntryProps> = ({
   tx,
 }) => {
-  const [current, , service] = useMintMachine(tx);
+  const [current, , service] = useMintMachine(tx)
   useEffect(
     () => () => {
-      service.stop();
+      service.stop()
     },
     [service]
-  );
-  return <GatewayEntry service={service} tx={current.context.tx} />;
-};
+  )
+  return <GatewayEntry service={service} tx={current.context.tx} />
+}
 
 const standardPaddings = {
   paddingLeft: 40,
   paddingRight: 50,
-};
+}
 
-const standardShadow = `0px 0px 4px rgba(0, 27, 58, 0.1)`;
+const standardShadow = `0px 0px 4px rgba(0, 27, 58, 0.1)`
 
 export const useGatewayEntryStyles = makeStyles((theme) => ({
   root: {
@@ -315,8 +313,8 @@ export const useGatewayEntryStyles = makeStyles((theme) => ({
     ...standardPaddings,
     paddingTop: 8,
     paddingBottom: 8,
-    display: "flex",
-    justifyContent: "stretch",
+    display: 'flex',
+    justifyContent: 'stretch',
     borderBottom: `1px solid ${theme.palette.divider}`,
   },
   gatewayInfo: {
@@ -331,15 +329,15 @@ export const useGatewayEntryStyles = makeStyles((theme) => ({
   },
   gatewayCounter: {
     minWidth: 180,
-    display: "flex",
-    justifyContent: "flex-end",
+    display: 'flex',
+    justifyContent: 'flex-end',
   },
   multiple: {
     ...standardPaddings,
     height: 32,
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     borderBottom: `1px solid ${theme.palette.divider}`,
   },
   multipleLabel: {
@@ -351,20 +349,20 @@ export const useGatewayEntryStyles = makeStyles((theme) => ({
     paddingTop: 6,
     paddingBottom: 6,
     minHeight: 64,
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "stretch",
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'stretch',
   },
   details: {
     width: 360,
-    display: "flex",
-    alignItems: "center",
+    display: 'flex',
+    alignItems: 'center',
   },
   detailsTitleAndDate: {
     flexGrow: 2,
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   detailsTitle: {
     fontSize: 14,
@@ -375,47 +373,47 @@ export const useGatewayEntryStyles = makeStyles((theme) => ({
   links: {},
   link: {
     fontSize: 12,
-    display: "inline-block",
+    display: 'inline-block',
     marginRight: 16,
-    "&:last-child": {
+    '&:last-child': {
       marginRight: 0,
     },
   },
   statusAndActions: {
-    display: "flex",
+    display: 'flex',
     flexGrow: 2,
   },
   status: {
-    display: "flex",
-    alignItems: "center",
+    display: 'flex',
+    alignItems: 'center',
   },
   indicator: {
     width: 40,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   actions: {
-    display: "flex",
-    justifyContent: "flex-end",
-    alignItems: "center",
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
     flexGrow: 1,
     paddingRight: 10,
   },
-}));
+}))
 
 const GatewayEntry: FunctionComponent<GatewayEntryProps> = ({
   tx,
   isActive,
   service,
 }) => {
-  const { t } = useTranslation();
-  const theme = useTheme();
-  const styles = useGatewayEntryStyles();
-  const dispatch = useDispatch();
-  const history = useHistory();
+  const { t } = useTranslation()
+  const theme = useTheme()
+  const styles = useGatewayEntryStyles()
+  const dispatch = useDispatch()
+  const history = useHistory()
 
-  const [resolving, setResolving] = useState(true);
+  const [resolving, setResolving] = useState(true)
 
   const {
     handleNext,
@@ -423,7 +421,7 @@ const GatewayEntry: FunctionComponent<GatewayEntryProps> = ({
     currentIndex,
     currentHash,
     total,
-  } = useDepositPagination(tx);
+  } = useDepositPagination(tx)
 
   const {
     lockChainConfig,
@@ -432,10 +430,10 @@ const GatewayEntry: FunctionComponent<GatewayEntryProps> = ({
     mintChainConfig,
     depositsCount,
     gatewayStatus,
-  } = getLockAndMintBasicParams(tx);
+  } = getLockAndMintBasicParams(tx)
 
-  const deposit = tx.transactions[currentHash];
-  const depositTime = getFormattedDateTime(Number(deposit?.detectedAt));
+  const deposit = tx.transactions[currentHash]
+  const depositTime = getFormattedDateTime(Number(deposit?.detectedAt))
   const {
     lockConfirmations,
     lockTargetConfirmations,
@@ -444,73 +442,73 @@ const GatewayEntry: FunctionComponent<GatewayEntryProps> = ({
     mintTxLink,
     depositStatus,
     depositPhase,
-  } = getDepositParams(tx, deposit);
-  const hasDeposits = depositsCount > 0;
+  } = getDepositParams(tx, deposit)
+  const hasDeposits = depositsCount > 0
 
   const StatusIcon = getDepositStatusIcon({
     depositStatus,
     depositPhase,
     mintChainConfig,
     lockChainConfig,
-  });
+  })
 
   const handlePageChange = useCallback(
     (event: any, newPage: number) => {
-      newPage > currentIndex ? handleNext() : handlePrev();
+      newPage > currentIndex ? handleNext() : handlePrev()
     },
     [currentIndex, handleNext, handlePrev]
-  );
+  )
 
   const handleContinue = useCallback(() => {
-    const qsTx = { ...tx, depositHash: currentHash };
+    const qsTx = { ...tx, depositHash: currentHash }
     history.push({
       pathname: paths.MINT_TRANSACTION,
-      search: "?" + createTxQueryString(qsTx),
+      search: '?' + createTxQueryString(qsTx),
       state: {
         txState: {
           reloadTx: true,
         },
       },
-    });
-    dispatch(setTxHistoryOpened(false));
-  }, [dispatch, history, tx, currentHash]);
+    })
+    dispatch(setTxHistoryOpened(false))
+  }, [dispatch, history, tx, currentHash])
 
   const timeToGatewayExpiration = useIntervalCountdown(
     getRemainingGatewayTime(tx.expiryTime)
-  );
+  )
 
-  const [timer, setTimer] = useState<NodeJS.Timeout>();
-  const gatewayAddress = (tx as OpenedGatewaySession<any>).gatewayAddress;
+  const [timer, setTimer] = useState<NodeJS.Timeout>()
+  const gatewayAddress = (tx as OpenedGatewaySession<any>).gatewayAddress
   useEffect(() => {
     if (gatewayAddress) {
       if (hasDeposits) {
         //
-        //service?.stop();
+        // service?.stop();
         if (timer) {
-          clearTimeout(timer);
+          clearTimeout(timer)
         }
-        setResolving(false);
+        setResolving(false)
       } else {
         if (!timer) {
           setTimer(
             setTimeout(() => {
-              service?.stop();
-              setResolving(false);
+              service?.stop()
+              setResolving(false)
             }, 25000)
-          );
+          )
         }
       }
     }
-  }, [service, gatewayAddress, timer, hasDeposits]);
+  }, [service, gatewayAddress, timer, hasDeposits])
 
-  const allCompleted = areAllDepositsCompleted(tx);
-  const completed = depositStatus === DepositEntryStatus.COMPLETED;
+  const allCompleted = areAllDepositsCompleted(tx)
+  const completed = depositStatus === DepositEntryStatus.COMPLETED
   const confirmationProps = completed
     ? {}
     : {
         confirmations: lockConfirmations,
         targetConfirmations: lockTargetConfirmations,
-      };
+      }
   return (
     <>
       <div className={styles.root}>
@@ -559,8 +557,8 @@ const GatewayEntry: FunctionComponent<GatewayEntryProps> = ({
             <div className={styles.detailsTitleAndDate}>
               {hasDeposits && (
                 <>
-                  <Typography className={styles.detailsTitle} component="div">
-                    {t("history.mint-entry-label", {
+                  <Typography className={styles.detailsTitle} component='div'>
+                    {t('history.mint-entry-label', {
                       amount: lockTxAmount,
                       currency: mintCurrencyConfig.short,
                       chain: mintChainConfig.full,
@@ -570,36 +568,36 @@ const GatewayEntry: FunctionComponent<GatewayEntryProps> = ({
                         <Link
                           href={lockTxLink}
                           external
-                          color="primary"
-                          underline="hover"
+                          color='primary'
+                          underline='hover'
                           className={styles.link}
                         >
-                          {lockChainConfig.full} {t("common.transaction")}
+                          {lockChainConfig.full} {t('common.transaction')}
                         </Link>
                       )}
                       {Boolean(mintTxLink) && (
                         <Link
                           href={mintTxLink}
                           external
-                          color="primary"
-                          underline="hover"
+                          color='primary'
+                          underline='hover'
                           className={styles.link}
                         >
-                          {mintChainConfig.full} {t("common.transaction")}
+                          {mintChainConfig.full} {t('common.transaction')}
                         </Link>
                       )}
                     </div>
                   </Typography>
                   {Boolean(deposit) && Boolean(deposit?.detectedAt) && (
                     <Typography
-                      color="textSecondary"
-                      component="span"
-                      variant="inherit"
+                      color='textSecondary'
+                      component='span'
+                      variant='inherit'
                       className={styles.detailsDate}
                     >
                       <Tooltip
                         title={`${depositTime.date} ${depositTime.time} `}
-                        placement="top"
+                        placement='top'
                       >
                         <span>{depositTime.date}</span>
                       </Tooltip>
@@ -613,7 +611,7 @@ const GatewayEntry: FunctionComponent<GatewayEntryProps> = ({
                     <Skeleton width={200} />
                   ) : (
                     <Typography className={styles.detailsTitle}>
-                      {t("history.no-deposits-message")}
+                      {t('history.no-deposits-message')}
                     </Typography>
                   )}
                 </>
@@ -623,7 +621,7 @@ const GatewayEntry: FunctionComponent<GatewayEntryProps> = ({
           <div className={styles.statusAndActions}>
             <div className={styles.actions}>
               {isActive && (
-                <Typography color="primary" variant="caption">
+                <Typography color='primary' variant='caption'>
                   Close window to view
                 </Typography>
               )}
@@ -631,13 +629,13 @@ const GatewayEntry: FunctionComponent<GatewayEntryProps> = ({
                 <>
                   {depositStatus === DepositEntryStatus.ACTION_REQUIRED && (
                     <SmallActionButton onClick={handleContinue}>
-                      {t("history.action-required-label")}
+                      {t('history.action-required-label')}
                     </SmallActionButton>
                   )}
                   {depositStatus === DepositEntryStatus.PENDING &&
                     lockConfirmations < lockTargetConfirmations && (
-                      <Typography color="textPrimary" variant="caption">
-                        {t("history.mint-entry-confirmations", {
+                      <Typography color='textPrimary' variant='caption'>
+                        {t('history.mint-entry-confirmations', {
                           confirmations: lockConfirmations,
                           targetConfirmations: lockTargetConfirmations,
                         })}
@@ -648,7 +646,7 @@ const GatewayEntry: FunctionComponent<GatewayEntryProps> = ({
             </div>
             <div className={styles.status}>
               {resolving && (
-                <Skeleton variant="circle" width={42} height={42} />
+                <Skeleton variant='circle' width={42} height={42} />
               )}
               {!resolving && hasDeposits && (
                 <CircledProgressWithContent
@@ -675,20 +673,20 @@ const GatewayEntry: FunctionComponent<GatewayEntryProps> = ({
         </div>
       </div>
     </>
-  );
-};
+  )
+}
 
 type GatewayStatusChipProps = {
   status: GatewayStatus;
   timeToGatewayExpiration?: number;
-};
+}
 
 export const GatewayStatusChip: FunctionComponent<GatewayStatusChipProps> = ({
   status,
   timeToGatewayExpiration = 0,
 }) => {
-  const { t } = useTranslation();
-  const label = t("history.time-remaining-label") + ": ";
+  const { t } = useTranslation()
+  const label = t('history.time-remaining-label') + ': '
   switch (status) {
     case GatewayStatus.CURRENT:
       return (
@@ -702,7 +700,7 @@ export const GatewayStatusChip: FunctionComponent<GatewayStatusChipProps> = ({
             </span>
           }
         />
-      );
+      )
     case GatewayStatus.PREVIOUS:
       return (
         <WarningChip
@@ -715,7 +713,7 @@ export const GatewayStatusChip: FunctionComponent<GatewayStatusChipProps> = ({
             </span>
           }
         />
-      );
+      )
     case GatewayStatus.EXPIRING:
       return (
         <ErrorChip
@@ -728,50 +726,50 @@ export const GatewayStatusChip: FunctionComponent<GatewayStatusChipProps> = ({
             </span>
           }
         />
-      );
+      )
     case GatewayStatus.EXPIRED:
-      return <Chip label={t("history.gateway-expired-label")} />;
+      return <Chip label={t('history.gateway-expired-label')} />
     default:
-      return null;
+      return null
   }
-};
+}
 
 type GatewayAddressProps = {
   status: GatewayStatus;
   address: string;
   onClick: () => void;
-};
+}
 
 const useGatewayAddressStyles = makeStyles(() => ({
   icon: {
     marginBottom: -1,
   },
   disabled: {
-    userSelect: "none",
+    userSelect: 'none',
   },
-}));
+}))
 export const GatewayAddress: FunctionComponent<GatewayAddressProps> = ({
   status,
   onClick,
   address,
 }) => {
-  const styles = useGatewayAddressStyles();
+  const styles = useGatewayAddressStyles()
   if (status === GatewayStatus.CURRENT) {
     return (
-      <Typography variant="caption">
-        <Link color="primary" underline="hover" onClick={onClick}>
+      <Typography variant='caption'>
+        <Link color='primary' underline='hover' onClick={onClick}>
           {address}
         </Link>
       </Typography>
-    );
+    )
   }
   return (
     <Typography
       className={styles.disabled}
-      color="textSecondary"
-      variant="caption"
+      color='textSecondary'
+      variant='caption'
     >
-      <BlockIcon className={styles.icon} fontSize="inherit" /> {address}
+      <BlockIcon className={styles.icon} fontSize='inherit' /> {address}
     </Typography>
-  );
-};
+  )
+}

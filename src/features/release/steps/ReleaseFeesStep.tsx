@@ -1,28 +1,28 @@
-import { Divider, IconButton, Typography } from "@material-ui/core";
+import { Divider, IconButton, Typography } from '@material-ui/core'
 import React, {
   FunctionComponent,
   useCallback,
   useEffect,
   useMemo,
   useState,
-} from "react";
-import { useTranslation } from "react-i18next";
-import { useDispatch, useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
+} from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 import {
   ActionButton,
   ActionButtonWrapper,
-} from "../../../components/buttons/Buttons";
-import { NumberFormatText } from "../../../components/formatting/NumberFormatText";
-import { BackArrowIcon } from "../../../components/icons/RenIcons";
+} from '../../../components/buttons/Buttons'
+import { NumberFormatText } from '../../../components/formatting/NumberFormatText'
+import { BackArrowIcon } from '../../../components/icons/RenIcons'
 import {
   PaperActions,
   PaperContent,
   PaperHeader,
   PaperNav,
   PaperTitle,
-} from "../../../components/layout/Paper";
-import { CenteredProgress } from "../../../components/progress/ProgressHelpers";
+} from '../../../components/layout/Paper'
+import { CenteredProgress } from '../../../components/progress/ProgressHelpers'
 import {
   AssetInfo,
   BigAssetAmount,
@@ -30,136 +30,137 @@ import {
   LabelWithValue,
   MiddleEllipsisText,
   SpacedDivider,
-} from "../../../components/typography/TypographyHelpers";
-import { paths } from "../../../pages/routes";
+} from '../../../components/typography/TypographyHelpers'
+import { paths } from '../../../pages/routes'
 import {
   getChainConfig,
   getCurrencyConfig,
   getNativeCurrency,
   toReleasedCurrency,
-} from "../../../utils/assetConfigs";
-import { useFetchFees } from "../../fees/feesHooks";
-import { getTransactionFees } from "../../fees/feesUtils";
-import { $exchangeRates } from "../../marketData/marketDataSlice";
-import { findExchangeRate, USD_SYMBOL } from "../../marketData/marketDataUtils";
-import { $renNetwork } from "../../network/networkSlice";
-import { TransactionFees } from "../../transactions/components/TransactionFees";
+} from '../../../utils/assetConfigs'
+import { useFetchFees } from '../../fees/feesHooks'
+import { getTransactionFees } from '../../fees/feesUtils'
+import { $exchangeRates } from '../../marketData/marketDataSlice'
+import { findExchangeRate, USD_SYMBOL } from '../../marketData/marketDataUtils'
+import { $renNetwork } from '../../network/networkSlice'
+import { TransactionFees } from '../../transactions/components/TransactionFees'
 import {
   createTxQueryString,
   getReleaseAssetDecimals,
   LocationTxState,
   TxConfigurationStepProps,
   TxType,
-} from "../../transactions/transactionsUtils";
-import { useSelectedChainWallet } from "../../wallet/walletHooks";
+} from '../../transactions/transactionsUtils'
+import { useSelectedChainWallet } from '../../wallet/walletHooks'
 import {
   $multiwalletChain,
   $wallet,
   setWalletPickerOpened,
-} from "../../wallet/walletSlice";
-import { $release, $releaseUsdAmount } from "../releaseSlice";
+} from '../../wallet/walletSlice'
+import { $release, $releaseUsdAmount } from '../releaseSlice'
 import {
   createReleaseTransaction,
   preValidateReleaseTransaction,
-} from "../releaseUtils";
+} from '../releaseUtils'
 
 export const ReleaseFeesStep: FunctionComponent<TxConfigurationStepProps> = ({
   onPrev,
 }) => {
-  const { t } = useTranslation();
-  const dispatch = useDispatch();
-  const history = useHistory();
-  const { account, walletConnected } = useSelectedChainWallet();
-  const [releasingInitialized, setReleasingInitialized] = useState(false);
-  const { amount, currency, address } = useSelector($release);
-  const network = useSelector($renNetwork);
-  const { chain } = useSelector($wallet);
-  const renChain = useSelector($multiwalletChain);
-  const amountUsd = useSelector($releaseUsdAmount);
-  const rates = useSelector($exchangeRates);
-  const { fees, pending } = useFetchFees(currency, TxType.BURN);
+  const { t } = useTranslation()
+  const dispatch = useDispatch()
+  const history = useHistory()
+  const { account, walletConnected } = useSelectedChainWallet()
+  const [releasingInitialized, setReleasingInitialized] = useState(false)
+  const { amount, currency, address } = useSelector($release)
+  const network = useSelector($renNetwork)
+  const { chain } = useSelector($wallet)
+  const renChain = useSelector($multiwalletChain)
+  const amountUsd = useSelector($releaseUsdAmount)
+  const rates = useSelector($exchangeRates)
+  const { fees, pending } = useFetchFees(currency, TxType.BURN)
 
-  const destinationCurrency = toReleasedCurrency(currency);
-  const currencyConfig = getCurrencyConfig(currency);
-  const nativeCurrencyConfig = getCurrencyConfig(getNativeCurrency(currency));
+  const destinationCurrency = toReleasedCurrency(currency)
+  const currencyConfig = getCurrencyConfig(currency)
+  const nativeCurrencyConfig = getCurrencyConfig(getNativeCurrency(currency))
 
-  const targetChainConfig = getChainConfig(chain);
+  const targetChainConfig = getChainConfig(chain)
   const decimals =
     targetChainConfig.nativeCurrency === currency
       ? getReleaseAssetDecimals(
-          targetChainConfig.symbol,
-          targetChainConfig.nativeCurrency
+        targetChainConfig.nativeCurrency,
+          targetChainConfig.symbol
         )
       : getReleaseAssetDecimals(
-          nativeCurrencyConfig.sourceChain,
-          nativeCurrencyConfig.symbol
-        );
+        nativeCurrencyConfig.symbol,
+          nativeCurrencyConfig.sourceChain
+        )
 
   const { conversionTotal } = getTransactionFees({
     amount,
     fees,
     type: TxType.BURN,
     decimals,
-  });
+  })
 
-  const chainConfig = getChainConfig(chain);
+  const chainConfig = getChainConfig(chain)
   const destinationCurrencyUsdRate = findExchangeRate(
     rates,
     destinationCurrency,
     USD_SYMBOL
-  );
+  )
 
-  const conversionFormatted = conversionTotal;
+  const conversionFormatted = conversionTotal
 
-  const destinationAmountUsd = conversionFormatted * destinationCurrencyUsdRate;
-  const destinationCurrencyConfig = getCurrencyConfig(destinationCurrency);
-  const { MainIcon } = destinationCurrencyConfig;
+  const destinationAmountUsd = conversionFormatted * destinationCurrencyUsdRate
+  const destinationCurrencyConfig = getCurrencyConfig(destinationCurrency)
+  const { MainIcon } = destinationCurrencyConfig
   const tx = useMemo(
     () =>
       createReleaseTransaction({
-        amount: amount,
-        currency: currency,
+        amount,
+        currency,
         destAddress: address,
         userAddress: account,
         sourceChain: renChain,
-        network: network,
+        network,
       }),
     [amount, currency, address, account, renChain, network]
-  );
-  const canInitializeReleasing = preValidateReleaseTransaction(tx);
+  )
+  const canInitializeReleasing = preValidateReleaseTransaction(tx)
 
   const handleConfirm = useCallback(() => {
-    setReleasingInitialized(true);
+    setReleasingInitialized(true)
     if (walletConnected) {
       if (canInitializeReleasing) {
-        setReleasingInitialized(true);
+        setReleasingInitialized(true)
       } else {
-        setReleasingInitialized(false);
+        setReleasingInitialized(false)
       }
     } else {
-      setReleasingInitialized(false);
-      dispatch(setWalletPickerOpened(true));
+      setReleasingInitialized(false)
+      dispatch(setWalletPickerOpened(true))
     }
-  }, [dispatch, canInitializeReleasing, walletConnected]);
+  }, [dispatch, canInitializeReleasing, walletConnected])
 
   const onReleaseTxCreated = useCallback(
+    // tslint:disable-next-line: no-shadowed-variable
     (tx) => {
       history.push({
         pathname: paths.RELEASE_TRANSACTION,
-        search: "?" + createTxQueryString(tx),
+        search: '?' + createTxQueryString(tx),
         state: {
           txState: { newTx: true },
         } as LocationTxState,
-      });
+      })
     },
     [history]
-  );
+  )
 
   useEffect(() => {
     if (releasingInitialized) {
-      onReleaseTxCreated(tx);
+      onReleaseTxCreated(tx)
     }
-  }, [onReleaseTxCreated, releasingInitialized, tx]);
+  }, [onReleaseTxCreated, releasingInitialized, tx])
 
   return (
     <>
@@ -169,7 +170,7 @@ export const ReleaseFeesStep: FunctionComponent<TxConfigurationStepProps> = ({
             <BackArrowIcon />
           </IconButton>
         </PaperNav>
-        <PaperTitle>{t("release.fees-title")}</PaperTitle>
+        <PaperTitle>{t('release.fees-title')}</PaperTitle>
         <PaperActions />
       </PaperHeader>
       <PaperContent bottomPadding>
@@ -183,12 +184,12 @@ export const ReleaseFeesStep: FunctionComponent<TxConfigurationStepProps> = ({
             }
           />
         </BigAssetAmountWrapper>
-        <Typography variant="body1" gutterBottom>
-          {t("release.details-label")}
+        <Typography variant='body1' gutterBottom>
+          {t('release.details-label')}
         </Typography>
         <LabelWithValue
-          label={t("release.releasing-label")}
-          labelTooltip={t("release.releasing-tooltip")}
+          label={t('release.releasing-label')}
+          labelTooltip={t('release.releasing-tooltip')}
           value={
             <NumberFormatText
               value={amount}
@@ -198,25 +199,25 @@ export const ReleaseFeesStep: FunctionComponent<TxConfigurationStepProps> = ({
           valueEquivalent={
             <NumberFormatText
               value={amountUsd}
-              spacedSuffix="USD"
+              spacedSuffix='USD'
               decimalScale={2}
               fixedDecimalScale
             />
           }
         />
         <LabelWithValue
-          label={t("release.from-label")}
-          labelTooltip={t("release.from-tooltip")}
+          label={t('release.from-label')}
+          labelTooltip={t('release.from-tooltip')}
           value={chainConfig.full}
         />
         <LabelWithValue
-          label={t("release.to-label")}
-          labelTooltip={t("release.to-tooltip")}
+          label={t('release.to-label')}
+          labelTooltip={t('release.to-tooltip')}
           value={<MiddleEllipsisText hoverable>{address}</MiddleEllipsisText>}
         />
         <SpacedDivider />
-        <Typography variant="body1" gutterBottom>
-          {t("fees.label")}
+        <Typography variant='body1' gutterBottom>
+          {t('fees.label')}
         </Typography>
         <TransactionFees
           chain={chain}
@@ -232,7 +233,7 @@ export const ReleaseFeesStep: FunctionComponent<TxConfigurationStepProps> = ({
             <CenteredProgress />
           ) : (
             <AssetInfo
-              label={t("release.receiving-label") + ":"}
+              label={t('release.receiving-label') + ':'}
               value={
                 <NumberFormatText
                   value={conversionFormatted}
@@ -241,26 +242,26 @@ export const ReleaseFeesStep: FunctionComponent<TxConfigurationStepProps> = ({
               }
               valueEquivalent={
                 <NumberFormatText
-                  prefix=" = $"
+                  prefix=' = $'
                   value={destinationAmountUsd}
-                  spacedSuffix="USD"
+                  spacedSuffix='USD'
                   decimalScale={2}
                   fixedDecimalScale
                 />
               }
-              Icon={<MainIcon fontSize="inherit" />}
+              Icon={<MainIcon fontSize='inherit' />}
             />
           ))}
         <ActionButtonWrapper>
           <ActionButton onClick={handleConfirm} disabled={releasingInitialized}>
             {!walletConnected
-              ? t("wallet.connect")
+              ? t('wallet.connect')
               : releasingInitialized
-              ? t("release.confirming-label")
-              : t("release.confirm-label")}
+              ? t('release.confirming-label')
+              : t('release.confirm-label')}
           </ActionButton>
         </ActionButtonWrapper>
       </PaperContent>
     </>
-  );
-};
+  )
+}

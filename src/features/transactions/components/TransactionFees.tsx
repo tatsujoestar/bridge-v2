@@ -1,15 +1,15 @@
-import React, { FunctionComponent } from "react";
-import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
-import { NumberFormatText } from "../../../components/formatting/NumberFormatText";
-import { CenteredProgress } from "../../../components/progress/ProgressHelpers";
+import React, { FunctionComponent } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { NumberFormatText } from '../../../components/formatting/NumberFormatText'
+import { CenteredProgress } from '../../../components/progress/ProgressHelpers'
 import {
   LabelWithValue,
   MiddleEllipsisText,
-} from "../../../components/typography/TypographyHelpers";
-import { Debug } from "../../../components/utils/Debug";
-import { WalletStatus } from "../../../components/utils/types";
-import { MINT_GAS_UNIT_COST } from "../../../constants/constants";
+} from '../../../components/typography/TypographyHelpers'
+import { Debug } from '../../../components/utils/Debug'
+import { WalletStatus } from '../../../components/utils/types'
+import { MINT_GAS_UNIT_COST } from '../../../constants/constants'
 import {
   BridgeChain,
   BridgeCurrency,
@@ -17,22 +17,22 @@ import {
   getCurrencyConfig,
   getNativeCurrency,
   toReleasedCurrency,
-} from "../../../utils/assetConfigs";
-import { fromGwei } from "../../../utils/converters";
-import { useFetchFees } from "../../fees/feesHooks";
-import { getTransactionFees } from "../../fees/feesUtils";
-import { $exchangeRates, $gasPrices } from "../../marketData/marketDataSlice";
+} from '../../../utils/assetConfigs'
+import { fromGwei } from '../../../utils/converters'
+import { useFetchFees } from '../../fees/feesHooks'
+import { getTransactionFees } from '../../fees/feesUtils'
+import { $exchangeRates, $gasPrices } from '../../marketData/marketDataSlice'
 import {
   findExchangeRate,
   findGasPrice,
   USD_SYMBOL,
-} from "../../marketData/marketDataUtils";
-import { useSelectedChainWallet } from "../../wallet/walletHooks";
+} from '../../marketData/marketDataUtils'
+import { useSelectedChainWallet } from '../../wallet/walletHooks'
 import {
   getFeeTooltips,
   getReleaseAssetDecimals,
   TxType,
-} from "../transactionsUtils";
+} from '../transactionsUtils'
 
 type TransactionFeesProps = {
   type: TxType;
@@ -40,7 +40,7 @@ type TransactionFeesProps = {
   amount: number;
   chain: BridgeChain;
   address?: string;
-};
+}
 
 export const TransactionFees: FunctionComponent<TransactionFeesProps> = ({
   amount,
@@ -49,43 +49,43 @@ export const TransactionFees: FunctionComponent<TransactionFeesProps> = ({
   chain,
   address,
 }) => {
-  const { t } = useTranslation();
-  const { status } = useSelectedChainWallet();
-  const currencyConfig = getCurrencyConfig(currency);
-  const nativeCurrencyConfig = getCurrencyConfig(getNativeCurrency(currency));
-  const exchangeRates = useSelector($exchangeRates);
-  const gasPrices = useSelector($gasPrices);
-  const currencyUsdRate = findExchangeRate(exchangeRates, currency, USD_SYMBOL);
-  const gasPrice = findGasPrice(gasPrices, chain);
-  const targetChainConfig = getChainConfig(chain);
+  const { t } = useTranslation()
+  const { status } = useSelectedChainWallet()
+  const currencyConfig = getCurrencyConfig(currency)
+  const nativeCurrencyConfig = getCurrencyConfig(getNativeCurrency(currency))
+  const exchangeRates = useSelector($exchangeRates)
+  const gasPrices = useSelector($gasPrices)
+  const currencyUsdRate = findExchangeRate(exchangeRates, currency, USD_SYMBOL)
+  const gasPrice = findGasPrice(gasPrices, chain)
+  const targetChainConfig = getChainConfig(chain)
   const decimals = getReleaseAssetDecimals(
-    nativeCurrencyConfig.sourceChain,
-    nativeCurrencyConfig.symbol
-  );
+    nativeCurrencyConfig.symbol,
+    nativeCurrencyConfig.sourceChain
+  )
 
   const targetChainCurrencyUsdRate = findExchangeRate(
     exchangeRates,
     targetChainConfig.nativeCurrency,
     USD_SYMBOL
-  );
-  const hasAmount = !isNaN(amount) && amount !== 0;
-  const amountUsd = amount * currencyUsdRate;
-  const { fees, pending } = useFetchFees(currency, type);
+  )
+  const hasAmount = !isNaN(amount) && amount !== 0
+  const amountUsd = amount * currencyUsdRate
+  const { fees, pending } = useFetchFees(currency, type)
   const { renVMFee, renVMFeeAmount, networkFee } = getTransactionFees({
     amount,
     fees,
     type,
     decimals,
-  });
-  const renVMFeeAmountUsd = amountUsd * renVMFee;
-  const networkFeeUsd = networkFee * currencyUsdRate;
+  })
+  const renVMFeeAmountUsd = amountUsd * renVMFee
+  const networkFeeUsd = networkFee * currencyUsdRate
 
   const sourceCurrency =
-    type === TxType.MINT ? currency : toReleasedCurrency(currency);
-  const sourceCurrencyConfig = getCurrencyConfig(sourceCurrency);
+    type === TxType.MINT ? currency : toReleasedCurrency(currency)
+  const sourceCurrencyConfig = getCurrencyConfig(sourceCurrency)
   const sourceCurrencyChainConfig = getChainConfig(
     sourceCurrencyConfig.sourceChain
-  );
+  )
 
   const tooltips = getFeeTooltips(
     {
@@ -95,30 +95,30 @@ export const TransactionFees: FunctionComponent<TransactionFeesProps> = ({
       chain,
     },
     t
-  );
+  )
 
-  const feeInGwei = Math.ceil(MINT_GAS_UNIT_COST * gasPrice * 1.18); // gas price to real gas price adjustment
-  const targetChainFeeNative = fromGwei(feeInGwei);
+  const feeInGwei = Math.ceil(MINT_GAS_UNIT_COST * gasPrice * 1.18) // gas price to real gas price adjustment
+  const targetChainFeeNative = fromGwei(feeInGwei)
   const targetChainFeeUsd = Math.max(
     fromGwei(feeInGwei) * targetChainCurrencyUsdRate,
     0.001
-  );
+  )
   const targetChainCurrency = getCurrencyConfig(
     targetChainConfig.nativeCurrency
-  );
+  )
 
   if (status !== WalletStatus.CONNECTED) {
-    return null;
+    return null
   }
   if (pending) {
-    return <CenteredProgress />;
+    return <CenteredProgress />
   }
 
   return (
     <>
       <Debug it={{ targetChainCurrencyUsdRate, currency, fees }} />
       <LabelWithValue
-        label={t("fees.ren-fee-label")}
+        label={t('fees.ren-fee-label')}
         labelTooltip={tooltips.renVmFee}
         value={
           hasAmount ? (
@@ -137,17 +137,17 @@ export const TransactionFees: FunctionComponent<TransactionFeesProps> = ({
           hasAmount ? (
             <NumberFormatText
               value={renVMFeeAmountUsd}
-              prefix="$"
+              prefix='$'
               decimalScale={2}
               fixedDecimalScale
             />
           ) : (
-            ""
+            ''
           )
         }
       />
       <LabelWithValue
-        label={t("fees.chain-miner-fee-label", {
+        label={t('fees.chain-miner-fee-label', {
           chain: sourceCurrencyChainConfig.full,
         })}
         labelTooltip={tooltips.sourceChainMinerFee}
@@ -160,14 +160,14 @@ export const TransactionFees: FunctionComponent<TransactionFeesProps> = ({
         valueEquivalent={
           <NumberFormatText
             value={networkFeeUsd}
-            prefix="$"
+            prefix='$'
             decimalScale={2}
             fixedDecimalScale
           />
         }
       />
       <LabelWithValue
-        label={t("fees.ren-currency-chain-fee-label", {
+        label={t('fees.ren-currency-chain-fee-label', {
           chain: targetChainConfig.short,
         })}
         labelTooltip={tooltips.renCurrencyChainFee}
@@ -181,7 +181,7 @@ export const TransactionFees: FunctionComponent<TransactionFeesProps> = ({
         valueEquivalent={
           <NumberFormatText
             value={targetChainFeeUsd}
-            prefix="$"
+            prefix='$'
             decimalScale={4}
           />
         }
@@ -189,11 +189,11 @@ export const TransactionFees: FunctionComponent<TransactionFeesProps> = ({
       <Debug it={{ targetChainFeeUsd }} />
       {address && (
         <LabelWithValue
-          label={t("mint.recipient-address-label")}
-          labelTooltip={t("mint.recipient-address-tooltip")}
+          label={t('mint.recipient-address-label')}
+          labelTooltip={t('mint.recipient-address-tooltip')}
           value={<MiddleEllipsisText hoverable>{address}</MiddleEllipsisText>}
         />
       )}
     </>
-  );
-};
+  )
+}

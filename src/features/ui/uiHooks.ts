@@ -4,7 +4,6 @@ import { useLocation } from 'react-router-dom'
 import { paths } from '../../pages/routes'
 import {
   BridgeChain,
-  EthTestnet,
   getCurrencyConfig,
   isMainnetNetwork,
   toMintedCurrency,
@@ -16,45 +15,45 @@ import { $chain } from '../wallet/walletSlice'
 import { setPaperShaking } from './uiSlice'
 
 export const useShakePaper = (shake: boolean, timeout = 600) => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
   useEffect(() => {
     if (shake) {
-      dispatch(setPaperShaking(true));
+      dispatch(setPaperShaking(true))
       setTimeout(() => {
-        dispatch(setPaperShaking(false));
-      }, timeout);
+        dispatch(setPaperShaking(false))
+      }, timeout)
     }
     return () => {
-      dispatch(setPaperShaking(false));
-    };
-  }, [dispatch, shake, timeout]);
-};
+      dispatch(setPaperShaking(false))
+    }
+  }, [dispatch, shake, timeout])
+}
 
 export const useLocationFlow = () => {
-  const location = useLocation();
+  const location = useLocation()
   if (location.pathname.indexOf(paths.MINT) > -1) {
-    return "mint";
+    return 'mint'
   } else if (location.pathname.indexOf(paths.RELEASE) > -1) {
-    return "burn";
+    return 'burn'
   }
-  return null;
-};
+  return null
+}
 
 export const useSubNetworkName = () => {
-  const flow = useLocationFlow();
-  const chain = useSelector($chain);
-  const renNetwork = useSelector($renNetwork);
-  const mintCurrency = useSelector($mintCurrency);
-  const releaseCurrency = useSelector($releaseCurrency);
+  const flow = useLocationFlow()
+  const chain = useSelector($chain)
+  const renNetwork = useSelector($renNetwork)
+  const mintCurrency = useSelector($mintCurrency)
+  const releaseCurrency = useSelector($releaseCurrency)
   if (
-    chain !== BridgeChain.ETHC ||
+    chain !== BridgeChain.BSCC ||
     flow == null ||
     isMainnetNetwork(renNetwork)
   ) {
-    return "";
+    return ''
   }
   const renCurrency =
-    flow === "mint" ? toMintedCurrency(mintCurrency) : releaseCurrency;
-  const currencyConfig = getCurrencyConfig(renCurrency);
-  return currencyConfig.ethTestnet || EthTestnet.KOVAN;
-};
+    flow === 'mint' ? toMintedCurrency(mintCurrency) : releaseCurrency
+  const currencyConfig = getCurrencyConfig(renCurrency)
+  return currencyConfig.sourceChain
+}

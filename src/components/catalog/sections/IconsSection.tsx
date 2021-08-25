@@ -1,11 +1,11 @@
-import { Box, useTheme } from "@material-ui/core";
-import GitHubIcon from "@material-ui/icons/GitHub";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
-import RedditIcon from "@material-ui/icons/Reddit";
-import TelegramIcon from "@material-ui/icons/Telegram";
-import TwitterIcon from "@material-ui/icons/Twitter";
-import React, { FunctionComponent } from "react";
-import { IconWithLabel } from "../../icons/IconHelpers";
+import { Box, useTheme } from '@material-ui/core'
+import GitHubIcon from '@material-ui/icons/GitHub'
+import MoreVertIcon from '@material-ui/icons/MoreVert'
+import RedditIcon from '@material-ui/icons/Reddit'
+import TelegramIcon from '@material-ui/icons/Telegram'
+import TwitterIcon from '@material-ui/icons/Twitter'
+import React, { FunctionComponent } from 'react'
+import { IconWithLabel } from '../../icons/IconHelpers'
 import {
   ArbitrumBlackIcon,
   ArbitrumCircleIcon,
@@ -18,6 +18,7 @@ import {
   BchGreyIcon,
   BchIcon,
   BinanceChainColorIcon,
+  StipdendFullIcon,
   BinanceChainFullIcon,
   BinanceChainIcon,
   BitcoinIcon,
@@ -66,14 +67,14 @@ import {
   ZecFullIcon,
   ZecGreyIcon,
   ZecIcon,
-} from "../../icons/RenIcons";
-import { Section, SeparationWrapper } from "../PresentationHelpers";
+} from '../../icons/RenIcons'
+import { Section, SeparationWrapper } from '../PresentationHelpers'
 
 export const IconsSection: FunctionComponent = () => {
-  const theme = useTheme();
+  const theme = useTheme()
 
   return (
-    <Section header="Icons">
+    <Section header='Icons'>
       <SeparationWrapper>
         <TwitterIcon />
         <RedditIcon />
@@ -143,6 +144,7 @@ export const IconsSection: FunctionComponent = () => {
         <BtcFullIcon />
         <BchFullIcon />
         <DogeFullIcon />
+        <StipdendFullIcon />
         <ZecFullIcon />
         <DgbFullIcon />
         <DotsFullIcon />
@@ -163,7 +165,7 @@ export const IconsSection: FunctionComponent = () => {
         <RenBridgeLogoIcon />
         <RenLogoFullIcon />
         <RenVMLogoIcon />
-        <Box bgcolor="gray" display="inline-block" p={1}>
+        <Box bgcolor='gray' display='inline-block' p={1}>
           <RenLogoIcon />
         </Box>
       </SeparationWrapper>
@@ -172,12 +174,12 @@ export const IconsSection: FunctionComponent = () => {
         <MetamaskFoxIcon />
       </SeparationWrapper>
       <SeparationWrapper>
-        <IconWithLabel label="BTC" Icon={BtcFullIcon} />
-        <IconWithLabel label="BCH" Icon={BchFullIcon} />
-        <IconWithLabel label="DOGE" Icon={DogeFullIcon} />
-        <IconWithLabel label="ZEC" Icon={ZecFullIcon} />
-        <IconWithLabel label="DGB" Icon={DgbFullIcon} />
+        <IconWithLabel label='BTC' Icon={BtcFullIcon} />
+        <IconWithLabel label='BCH' Icon={BchFullIcon} />
+        <IconWithLabel label='DOGE' Icon={DogeFullIcon} />
+        <IconWithLabel label='ZEC' Icon={ZecFullIcon} />
+        <IconWithLabel label='DGB' Icon={DgbFullIcon} />
       </SeparationWrapper>
     </Section>
-  );
-};
+  )
+}

@@ -1,13 +1,13 @@
-import React, { lazy, Suspense } from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { AppLoader } from "./components/progress/AppLoader";
-import { NotFoundPage } from "./pages/NotFoundPage";
-import { paths } from "./pages/routes";
-import { LegacyBridgeModal } from "./pages/Shared";
-import { WelcomePage } from "./pages/WelcomePage";
+import React, { lazy, Suspense } from 'react'
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import { AppLoader } from './components/progress/AppLoader'
+import { NotFoundPage } from './pages/NotFoundPage'
+import { paths } from './pages/routes'
+import { LegacyBridgeModal } from './pages/Shared'
+import { WelcomePage } from './pages/WelcomePage'
 
-const MainPage = lazy(() => import("./pages/MainPage"));
-const AboutPage = lazy(() => import("./pages/AboutPage"));
+const MainPage = lazy(() => import('./pages/MainPage'))
+const AboutPage = lazy(() => import('./pages/AboutPage'))
 
 const mainPagePaths = [
   paths.HOME,
@@ -15,7 +15,7 @@ const mainPagePaths = [
   paths.MINT_TRANSACTION,
   paths.RELEASE,
   paths.RELEASE_TRANSACTION,
-];
+]
 function App() {
   return (
     <Router>
@@ -29,7 +29,7 @@ function App() {
         <LegacyBridgeModal />
       </Suspense>
     </Router>
-  );
+  )
 }
 
-export default App;
+export default App

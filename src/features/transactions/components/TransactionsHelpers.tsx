@@ -9,74 +9,73 @@ import {
   Tooltip,
   Typography,
   useTheme,
-} from "@material-ui/core";
+} from '@material-ui/core'
 import {
   BurnSession,
   ErroringBurnSession,
   GatewaySession,
-} from "@renproject/ren-tx";
-import qs from "qs";
+} from '@renproject/ren-tx'
 import React, {
   FunctionComponent,
   useCallback,
   useEffect,
   useState,
-} from "react";
-import { useTranslation } from "react-i18next";
-import { useHistory } from "react-router-dom";
-import { useInterval } from "react-use";
+} from 'react'
+import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
+import { useInterval } from 'react-use'
 import {
   ActionButton,
   ActionButtonWrapper,
   RedButton,
-} from "../../../components/buttons/Buttons";
+} from '../../../components/buttons/Buttons'
 import {
   SpecialAlertIcon,
   WarningIcon,
-} from "../../../components/icons/RenIcons";
-import { CheckboxWrapper } from "../../../components/inputs/InputHelpers";
-import { Hide } from "../../../components/layout/LayoutHelpers";
+} from '../../../components/icons/RenIcons'
+import { CheckboxWrapper } from '../../../components/inputs/InputHelpers'
+import { Hide } from '../../../components/layout/LayoutHelpers'
 import {
   PaperContent,
   SpacedPaperContent,
-} from "../../../components/layout/Paper";
-import { Link } from "../../../components/links/Links";
+} from '../../../components/layout/Paper'
+import { Link } from '../../../components/links/Links'
 import {
   BridgeModal,
   NestedDrawer,
   NestedDrawerActions,
   NestedDrawerContent,
   NestedDrawerWrapper,
-} from "../../../components/modals/BridgeModal";
+} from '../../../components/modals/BridgeModal'
 import {
   ProgressWithContent,
   ProgressWrapper,
   TransactionStatusInfo,
-} from "../../../components/progress/ProgressHelpers";
+} from '../../../components/progress/ProgressHelpers'
 import {
   SpacedTypography,
   UnderlinedSpan,
-} from "../../../components/typography/TypographyHelpers";
-import { Debug } from "../../../components/utils/Debug";
-import { links } from "../../../constants/constants";
-import { paths } from "../../../pages/routes";
-import { usePaperTitle } from "../../../providers/TitleProviders";
-import { getFormattedHMS, millisecondsToHMS } from "../../../utils/dates";
-import { trimAddress } from "../../../utils/strings";
-import { createTxQueryString, parseTxQueryString } from "../transactionsUtils";
+} from '../../../components/typography/TypographyHelpers'
+import { Debug } from '../../../components/utils/Debug'
+import { links } from '../../../constants/constants'
+import { paths } from '../../../pages/routes'
+import { usePaperTitle } from '../../../providers/TitleProviders'
+import { getFormattedHMS, millisecondsToHMS } from '../../../utils/dates'
+import { trimAddress } from '../../../utils/strings'
+import { createTxQueryString, parseTxQueryString } from '../transactionsUtils'
 
 export type AnyBurnSession =
   | BurnSession<any, any>
-  | ErroringBurnSession<any, any>;
+  | ErroringBurnSession<any, any>
 
-export const ProcessingTimeWrapper = styled("div")({
+export const ProcessingTimeWrapper = styled('div')({
   marginTop: 5,
   marginBottom: 5,
-});
+})
 
 type BookmarkPageWarningProps = {
   onClosed?: () => void;
-};
+}
 
 // currently unused
 export const BookmarkPageWarning: FunctionComponent<BookmarkPageWarningProps> = ({
@@ -84,18 +83,18 @@ export const BookmarkPageWarning: FunctionComponent<BookmarkPageWarningProps> = 
 }) => {
   const handleClose = useCallback(() => {
     if (onClosed) {
-      onClosed();
+      onClosed()
     }
-  }, [onClosed]);
+  }, [onClosed])
   return (
-    <NestedDrawer title="Warning" onClose={handleClose} open>
+    <NestedDrawer title='Warning' onClose={handleClose} open>
       <NestedDrawerWrapper>
         <NestedDrawerContent>
           <PaperContent topPadding bottomPadding>
-            <Typography variant="h5" align="center" gutterBottom>
+            <Typography variant='h5' align='center' gutterBottom>
               Bookmark this page
             </Typography>
-            <Typography variant="body2" align="center" gutterBottom>
+            <Typography variant='body2' align='center' gutterBottom>
               To ensure you don’t lose track of your transaction, please
               bookmark this page.
             </Typography>
@@ -110,8 +109,8 @@ export const BookmarkPageWarning: FunctionComponent<BookmarkPageWarningProps> = 
         </NestedDrawerActions>
       </NestedDrawerWrapper>
     </NestedDrawer>
-  );
-};
+  )
+}
 
 type FinishTransactionWarningProps = {
   onClosed?: () => void;
@@ -121,7 +120,7 @@ type FinishTransactionWarningProps = {
   lockCurrencyLabel: string;
   mintCurrencyLabel: string;
   mintChainLabel: string;
-};
+}
 
 export const FinishTransactionWarning: FunctionComponent<FinishTransactionWarningProps> = ({
   onClosed,
@@ -132,28 +131,28 @@ export const FinishTransactionWarning: FunctionComponent<FinishTransactionWarnin
   mintCurrencyLabel,
   mintChainLabel,
 }) => {
-  const { t } = useTranslation();
-  const [checked, setChecked] = useState(true);
-  const history = useHistory();
+  const { t } = useTranslation()
+  const [checked, setChecked] = useState(true)
+  const history = useHistory()
 
   const handleCheckboxChange = useCallback(() => {
-    setChecked(!checked);
-  }, [checked]);
+    setChecked(!checked)
+  }, [checked])
 
   const handleClose = useCallback(() => {
     if (onClosed) {
-      onClosed();
+      onClosed()
     }
-  }, [onClosed]);
+  }, [onClosed])
 
   const handleCancel = useCallback(() => {
-    history.push(paths.MINT);
-  }, [history]);
+    history.push(paths.MINT)
+  }, [history])
 
-  const txTimeMinutes = lockChainBlockTime * lockChainConfirmations;
+  const txTimeMinutes = lockChainBlockTime * lockChainConfirmations
   return (
     <NestedDrawer
-      title={t("common.warning-label")}
+      title={t('common.warning-label')}
       open
       onClose={handleCancel}
       fixed={false}
@@ -161,46 +160,46 @@ export const FinishTransactionWarning: FunctionComponent<FinishTransactionWarnin
       <NestedDrawerWrapper>
         <NestedDrawerContent>
           <PaperContent topPadding>
-            <SpacedTypography variant="h5" align="center">
-              {t("mint.gateway-session-popup-message-1")}{" "}
+            <SpacedTypography variant='h5' align='center'>
+              {t('mint.gateway-session-popup-message-1')}{' '}
               <HCountdown milliseconds={timeRemained} />
-              {t("mint.gateway-session-popup-message-2")}
+              {t('mint.gateway-session-popup-message-2')}
             </SpacedTypography>
             <SpacedTypography
-              variant="body2"
-              align="center"
-              color="textSecondary"
+              variant='body2'
+              align='center'
+              color='textSecondary'
             >
-              {t("mint.gateway-session-popup-tx-time-message-1")}{" "}
+              {t('mint.gateway-session-popup-tx-time-message-1')}{' '}
               <Tooltip
                 title={
-                  <span>{t("mint.gateway-session-popup-tx-time-tooltip")}</span>
+                  <span>{t('mint.gateway-session-popup-tx-time-tooltip')}</span>
                 }
               >
                 <UnderlinedSpan>
-                  {txTimeMinutes} {t("common.minutes")}
+                  {txTimeMinutes} {t('common.minutes')}
                 </UnderlinedSpan>
-              </Tooltip>{" "}
-              {t("mint.gateway-session-popup-tx-time-message-2", {
+              </Tooltip>{' '}
+              {t('mint.gateway-session-popup-tx-time-message-2', {
                 confirmations: lockChainConfirmations,
                 currency: mintCurrencyLabel,
                 chain: mintChainLabel,
               })}
-            </SpacedTypography>{" "}
+            </SpacedTypography>{' '}
             <SpacedTypography
-              variant="body2"
-              align="center"
-              color="textSecondary"
+              variant='body2'
+              align='center'
+              color='textSecondary'
             >
-              {t("mint.gateway-session-popup-tx-completion-message-1")}
+              {t('mint.gateway-session-popup-tx-completion-message-1')}
             </SpacedTypography>
             <SpacedTypography
-              variant="body2"
-              align="center"
-              color="textSecondary"
+              variant='body2'
+              align='center'
+              color='textSecondary'
             >
               <strong>
-                {t("mint.gateway-session-popup-tx-completion-message-2")}
+                {t('mint.gateway-session-popup-tx-completion-message-2')}
               </strong>
             </SpacedTypography>
           </PaperContent>
@@ -214,15 +213,15 @@ export const FinishTransactionWarning: FunctionComponent<FinishTransactionWarnin
                     <Checkbox
                       checked={checked}
                       onChange={handleCheckboxChange}
-                      name="ack"
-                      color="primary"
+                      name='ack'
+                      color='primary'
                     />
                   }
                   label={
-                    <FormLabel htmlFor="ack" component={Typography}>
-                      <Typography variant="caption" color="textPrimary">
+                    <FormLabel htmlFor='ack' component={Typography}>
+                      <Typography variant='caption' color='textPrimary'>
                         {t(
-                          "mint.gateway-session-popup-tx-completion-ack-label"
+                          'mint.gateway-session-popup-tx-completion-ack-label'
                         )}
                       </Typography>
                     </FormLabel>
@@ -232,30 +231,30 @@ export const FinishTransactionWarning: FunctionComponent<FinishTransactionWarnin
             </CheckboxWrapper>
             <ActionButtonWrapper>
               <ActionButton onClick={handleClose} disabled={!checked}>
-                {t("common.continue-label")}
+                {t('common.continue-label')}
               </ActionButton>
             </ActionButtonWrapper>
           </PaperContent>
         </NestedDrawerActions>
       </NestedDrawerWrapper>
     </NestedDrawer>
-  );
-};
+  )
+}
 
 type ProgressStatusProps = {
   reason?: string;
   processing?: boolean;
-};
+}
 
 export const ProgressStatus: FunctionComponent<ProgressStatusProps> = ({
-  reason = "",
+  reason = '',
   processing = true,
 }) => {
-  const theme = useTheme();
-  const [, setTitle] = usePaperTitle();
+  const theme = useTheme()
+  const [, setTitle] = usePaperTitle()
   useEffect(() => {
-    setTitle(reason);
-  }, [setTitle, reason]);
+    setTitle(reason)
+  }, [setTitle, reason])
   return (
     <>
       <ProgressWrapper>
@@ -267,77 +266,77 @@ export const ProgressStatus: FunctionComponent<ProgressStatusProps> = ({
         </ProgressWithContent>
       </ProgressWrapper>
     </>
-  );
-};
+  )
+}
 
 export type TransactionItemProps = {
   tx: GatewaySession<any>;
   isActive?: boolean;
   onContinue?: ((depositHash?: string) => void) | (() => void);
-};
+}
 
-type HMSCountdownProps = { milliseconds: number };
+type HMSCountdownProps = { milliseconds: number }
 
 export const HMSCountdown: FunctionComponent<HMSCountdownProps> = ({
   milliseconds,
 }) => {
-  const [count, setCount] = useState(milliseconds);
+  const [count, setCount] = useState(milliseconds)
   useInterval(() => {
-    setCount((ms) => ms - 1000);
-  }, 1000);
-  const time = getFormattedHMS(count);
+    setCount((ms) => ms - 1000)
+  }, 1000)
+  const time = getFormattedHMS(count)
 
-  return <strong>{time}</strong>;
-};
+  return <strong>{time}</strong>
+}
 
 export const HCountdown: FunctionComponent<HMSCountdownProps> = ({
   milliseconds,
 }) => {
-  const { t } = useTranslation();
-  const [count, setCount] = useState(milliseconds);
+  const { t } = useTranslation()
+  const [count, setCount] = useState(milliseconds)
   useInterval(() => {
-    setCount((ms) => ms - 1000);
-  }, 60 * 1000);
-  const { hours } = millisecondsToHMS(count);
+    setCount((ms) => ms - 1000)
+  }, 60 * 1000)
+  const { hours } = millisecondsToHMS(count)
 
   return (
     <strong>
-      {hours}{" "}
-      {t("common.hour_interval", { postProcess: "interval", count: hours })}
+      {hours}{' '}
+      {t('common.hour_interval', { postProcess: 'interval', count: hours })}
     </strong>
-  );
-};
+  )
+}
 
-const ErrorIconWrapper = styled("div")(({ theme }) => ({
+const ErrorIconWrapper = styled('div')(({ theme }) => ({
   fontSize: 72,
   lineHeight: 1,
   marginTop: 8,
-  textAlign: "center",
+  textAlign: 'center',
   color: theme.customColors.textLight,
-}));
+}))
 
 type ErrorDetailsProps = {
   error: any;
-};
+}
 
 export const ErrorDetails: FunctionComponent<ErrorDetailsProps> = ({
   error,
 }) => {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false)
   const handleToggle = useCallback(() => {
-    setVisible(!visible);
-  }, [visible]);
+    setVisible(!visible)
+  }, [visible])
   return (
     <div>
-      <Button variant="text" size="small" onClick={handleToggle}>
-        Show {visible ? "less" : "more"}
+      <Button variant='text' size='small' onClick={handleToggle}>
+        Show {visible ? 'less' : 'more'}
       </Button>
       <Hide when={!visible}>
         <Debug force it={{ error }} />
       </Hide>
     </div>
-  );
-};
+  )
+}
 
 type ErrorWithActionProps = DialogProps & {
   title?: string;
@@ -345,31 +344,31 @@ type ErrorWithActionProps = DialogProps & {
   reason?: string;
   actionText?: string;
   error?: any;
-};
+}
 
 export const ErrorDialog: FunctionComponent<ErrorWithActionProps> = ({
-  title = "Error",
+  title = 'Error',
   open,
-  reason = "",
-  actionText = "",
+  reason = '',
+  actionText = '',
   onAction,
   error,
   children,
 }) => {
   return (
-    <BridgeModal open={open} title={title} maxWidth="xs">
+    <BridgeModal open={open} title={title} maxWidth='xs'>
       <SpacedPaperContent>
         <ErrorIconWrapper>
-          <WarningIcon fontSize="inherit" color="inherit" />
+          <WarningIcon fontSize='inherit' color='inherit' />
         </ErrorIconWrapper>
-        <Typography variant="h5" align="center" gutterBottom>
+        <Typography variant='h5' align='center' gutterBottom>
           {reason}
         </Typography>
         <Typography
-          color="textSecondary"
-          align="center"
+          color='textSecondary'
+          align='center'
           gutterBottom
-          component="div"
+          component='div'
         >
           {children}
         </Typography>
@@ -381,91 +380,91 @@ export const ErrorDialog: FunctionComponent<ErrorWithActionProps> = ({
         </ActionButtonWrapper>
       </PaperContent>
     </BridgeModal>
-  );
-};
+  )
+}
 
 export const SubmitErrorDialog: FunctionComponent<ErrorWithActionProps> = (
   props
 ) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation()
   return (
     <ErrorDialog
-      title={t("common.error-label")}
-      reason={t("tx.submitting-error-popup-header")}
-      actionText={t("tx.submitting-error-popup-action-text")}
+      title={t('common.error-label')}
+      reason={t('tx.submitting-error-popup-header')}
+      actionText={t('tx.submitting-error-popup-action-text')}
       {...props}
     >
-      <span>{t("tx.submitting-error-popup-message")}</span>
+      <span>{t('tx.submitting-error-popup-message')}</span>
     </ErrorDialog>
-  );
-};
+  )
+}
 
 export const GeneralErrorDialog: FunctionComponent<ErrorWithActionProps> = ({
   children,
   ...props
 }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation()
   return (
     <ErrorDialog
-      reason={t("tx.general-error-popup-header")}
-      actionText={t("tx.general-error-popup-action-text")}
+      reason={t('tx.general-error-popup-header')}
+      actionText={t('tx.general-error-popup-action-text')}
       {...props}
     >
       <span>
-        {t("tx.general-error-popup-message-1")}{" "}
-        <Link external href={links.BUGS_LOG} color="primary" underline="hover">
-          {t("tx.general-error-popup-submit-label")}
+        {t('tx.general-error-popup-message-1')}{' '}
+        <Link external href={links.BUGS_LOG} color='primary' underline='hover'>
+          {t('tx.general-error-popup-submit-label')}
         </Link>
         .
       </span>
       {children}
     </ErrorDialog>
-  );
-};
+  )
+}
 
 export const ExpiredErrorDialog: FunctionComponent<ErrorWithActionProps> = (
   props
 ) => {
-  const { t } = useTranslation();
-  const history = useHistory();
+  const { t } = useTranslation()
+  const history = useHistory()
 
   const ammendExpiry = useCallback(() => {
     // history.location.search
-    const tx = parseTxQueryString(history.location.search);
-    if (!tx) return;
-    tx.expiryTime = Date.now() + 60 * 60 * 24 * 1000;
+    const tx = parseTxQueryString(history.location.search)
+    if (!tx) return
+    tx.expiryTime = Date.now() + 60 * 60 * 24 * 1000
     history.push({
       pathname: paths.MINT_TRANSACTION,
-      search: "?" + createTxQueryString(tx as any),
-    });
-    window.location.reload();
-  }, [history]);
+      search: '?' + createTxQueryString(tx as any),
+    })
+    window.location.reload()
+  }, [history])
 
   const goToHome = useCallback(() => {
-    history.push(paths.HOME);
-  }, [history]);
+    history.push(paths.HOME)
+  }, [history])
 
   return (
     <ErrorDialog
-      title={t("tx.expired-error-popup-title")}
-      reason={t("tx.expired-error-popup-header")}
-      actionText={t("tx.expired-error-popup-action-text")}
+      title={t('tx.expired-error-popup-title')}
+      reason={t('tx.expired-error-popup-header')}
+      actionText={t('tx.expired-error-popup-action-text')}
       {...props}
     >
-      <span>{t("tx.expired-error-popup-message-1", { hours: 24 })}</span>
+      <span>{t('tx.expired-error-popup-message-1', { hours: 24 })}</span>
       <ActionButtonWrapper>
-        <RedButton variant="text" color="secondary" onClick={ammendExpiry}>
-          {t("tx.expired-error-continue-mint")}
+        <RedButton variant='text' color='secondary' onClick={ammendExpiry}>
+          {t('tx.expired-error-continue-mint')}
         </RedButton>
       </ActionButtonWrapper>
       <ActionButtonWrapper>
-        <Button variant="text" color="inherit" onClick={goToHome}>
-          {t("tx.expired-error-popup-back-to-home")}
+        <Button variant='text' color='inherit' onClick={goToHome}>
+          {t('tx.expired-error-popup-back-to-home')}
         </Button>
       </ActionButtonWrapper>
     </ErrorDialog>
-  );
-};
+  )
+}
 
 type WarningWithActionsProps = DialogProps & {
   title?: string;
@@ -476,35 +475,35 @@ type WarningWithActionsProps = DialogProps & {
   onAlternativeAction?: () => void;
   alternativeActionText?: string;
   alternativeActionDisabled?: boolean;
-};
+}
 
 export const WarningDialog: FunctionComponent<WarningWithActionsProps> = ({
-  title = "Warning",
+  title = 'Warning',
   open,
-  reason = "",
-  mainActionText = "",
+  reason = '',
+  mainActionText = '',
   onMainAction,
   mainActionDisabled,
-  alternativeActionText = "",
+  alternativeActionText = '',
   onAlternativeAction,
   alternativeActionDisabled,
   children,
 }) => {
-  const showMainAction = onMainAction && mainActionText;
+  const showMainAction = onMainAction && mainActionText
   return (
-    <BridgeModal open={open} title={title} maxWidth="xs">
+    <BridgeModal open={open} title={title} maxWidth='xs'>
       <SpacedPaperContent>
         <ErrorIconWrapper>
-          <SpecialAlertIcon fontSize="inherit" color="inherit" />
+          <SpecialAlertIcon fontSize='inherit' color='inherit' />
         </ErrorIconWrapper>
-        <Typography variant="h5" align="center" gutterBottom>
+        <Typography variant='h5' align='center' gutterBottom>
           {reason}
         </Typography>
         <Typography
-          color="textSecondary"
-          align="center"
+          color='textSecondary'
+          align='center'
           gutterBottom
-          component="div"
+          component='div'
         >
           {children}
         </Typography>
@@ -512,8 +511,8 @@ export const WarningDialog: FunctionComponent<WarningWithActionsProps> = ({
       <PaperContent bottomPadding>
         <ActionButtonWrapper>
           <RedButton
-            variant="text"
-            color="inherit"
+            variant='text'
+            color='inherit'
             onClick={onAlternativeAction}
             disabled={alternativeActionDisabled}
           >
@@ -529,14 +528,14 @@ export const WarningDialog: FunctionComponent<WarningWithActionsProps> = ({
         )}
       </PaperContent>
     </BridgeModal>
-  );
-};
+  )
+}
 
 type WrongAddressWarningDialogProps = WarningWithActionsProps & {
   address: string;
   addressExplorerLink: string;
   currency: string;
-};
+}
 
 export const WrongAddressWarningDialog: FunctionComponent<WrongAddressWarningDialogProps> = ({
   address,
@@ -544,32 +543,32 @@ export const WrongAddressWarningDialog: FunctionComponent<WrongAddressWarningDia
   currency,
   ...props
 }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation()
   return (
     <WarningDialog
-      title={t("common.warning-label")}
-      reason={t("tx.address-error-popup-header")}
-      alternativeActionText={t("tx.address-error-popup-action-text")}
+      title={t('common.warning-label')}
+      reason={t('tx.address-error-popup-header')}
+      alternativeActionText={t('tx.address-error-popup-action-text')}
       {...props}
     >
       <span>
-        {t("tx.address-error-popup-message-1")} (
+        {t('tx.address-error-popup-message-1')} (
         <Link
           external
           href={addressExplorerLink}
-          color="primary"
-          underline="hover"
+          color='primary'
+          underline='hover'
         >
           {trimAddress(address, 5)}
         </Link>
-        ).{" "}
-        {t("tx.address-error-popup-message-2", {
+        ).{' '}
+        {t('tx.address-error-popup-message-2', {
           currency,
         })}
       </span>
     </WarningDialog>
-  );
-};
+  )
+}
 
 // POC - keep
 export const PageLeaveWarningDialog: FunctionComponent<WarningWithActionsProps> = ({
@@ -590,9 +589,9 @@ export const PageLeaveWarningDialog: FunctionComponent<WarningWithActionsProps> 
 
   return (
     <WarningDialog
-      reason="Are you sure?"
-      mainActionText="I understand"
-      alternativeActionText="Stop reminding me"
+      reason='Are you sure?'
+      mainActionText='I understand'
+      alternativeActionText='Stop reminding me'
       {...props}
     >
       <span>
@@ -600,5 +599,5 @@ export const PageLeaveWarningDialog: FunctionComponent<WarningWithActionsProps> 
         this page.
       </span>
     </WarningDialog>
-  );
-};
+  )
+}

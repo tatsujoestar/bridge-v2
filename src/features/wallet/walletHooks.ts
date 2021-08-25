@@ -1,14 +1,14 @@
-import { RenNetwork } from "@renproject/interfaces";
-import { useMultiwallet } from "@renproject/multiwallet-ui";
-import { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { RenNetwork } from '@renproject/interfaces'
+import { useMultiwallet } from '@renproject/multiwallet-ui'
+import { useEffect } from 'react'
+import { useSelector } from 'react-redux'
 import {
   WalletConnectionStatusType,
   WalletStatus,
-} from "../../components/utils/types";
-import { BridgeWallet } from "../../utils/assetConfigs";
-import { $renNetwork } from "../network/networkSlice";
-import { $multiwalletChain } from "./walletSlice";
+} from '../../components/utils/types'
+import { BridgeWallet } from '../../utils/assetConfigs'
+import { $renNetwork } from '../network/networkSlice'
+import { $multiwalletChain } from './walletSlice'
 
 type WalletData = ReturnType<typeof useMultiwallet> & {
   account: string;
@@ -17,33 +17,25 @@ type WalletData = ReturnType<typeof useMultiwallet> & {
   provider: any;
   symbol: BridgeWallet;
   deactivateConnector: () => void;
-};
+}
 
 const resolveWallet = (provider: any) => {
   if (provider?.isMetaMask) {
-    return BridgeWallet.METAMASKW;
+    return BridgeWallet.METAMASKW
   }
 
-  if (provider?.wallet?._providerUrl?.href?.includes("sollet")) {
-    return BridgeWallet.SOLLETW;
-  }
-
-  if (provider?.wallet) {
-    return BridgeWallet.PHANTOMW;
-  }
-
-  if (provider?.chainId === "0x61" || provider?.chainId?.indexOf("Binance")) {
-    return BridgeWallet.BINANCESMARTW;
+  if (provider?.chainId === '0x61' || provider?.chainId?.indexOf('Binance')) {
+    return BridgeWallet.BINANCESMARTW
   }
 
   if (provider?.isMewConnect || provider?.isMEWConnect) {
-    return BridgeWallet.MEWCONNECTW;
+    return BridgeWallet.MEWCONNECTW
   }
 
-  return BridgeWallet.UNKNOWNW;
-};
+  return BridgeWallet.UNKNOWNW
+}
 
-type UseWallet = (chain: string) => WalletData;
+type UseWallet = (chain: string) => WalletData
 
 export const useWallet: UseWallet = (chain) => {
   const {
@@ -51,14 +43,14 @@ export const useWallet: UseWallet = (chain) => {
     targetNetwork,
     activateConnector,
     setTargetNetwork,
-  } = useMultiwallet();
-  const { account = "", status = "disconnected" } =
-    enabledChains?.[chain] || {};
-  const provider = enabledChains?.[chain]?.provider;
-  const symbol = resolveWallet(provider);
-  const emptyFn = () => {};
+  } = useMultiwallet()
+  const { account = '', status = 'disconnected' } =
+    enabledChains?.[chain] || {}
+  const provider = enabledChains?.[chain]?.provider
+  const symbol = resolveWallet(provider)
+  const emptyFn = () => {}
   const deactivateConnector =
-    enabledChains[chain]?.connector.deactivate || emptyFn;
+    enabledChains[chain]?.connector.deactivate || emptyFn
 
   return {
     account,
@@ -71,26 +63,26 @@ export const useWallet: UseWallet = (chain) => {
     activateConnector,
     setTargetNetwork,
     deactivateConnector,
-  } as WalletData;
-};
+  } as WalletData
+}
 
 export const useSelectedChainWallet = () => {
-  const multiwalletChain = useSelector($multiwalletChain);
-  return useWallet(multiwalletChain);
-};
+  const multiwalletChain = useSelector($multiwalletChain)
+  return useWallet(multiwalletChain)
+}
 
 export const useSyncMultiwalletNetwork = () => {
-  const { targetNetwork, setTargetNetwork } = useSelectedChainWallet();
-  const renNetwork = useSelector($renNetwork);
+  const { targetNetwork, setTargetNetwork } = useSelectedChainWallet()
+  const renNetwork = useSelector($renNetwork)
   useEffect(() => {
     if (renNetwork !== targetNetwork) {
       setTargetNetwork(
-        renNetwork.includes("mainnet")
+        renNetwork.includes('mainnet')
           ? RenNetwork.Mainnet
-          : renNetwork.includes("testnet")
+          : renNetwork.includes('testnet')
           ? RenNetwork.Testnet
           : renNetwork
-      );
+      )
     }
-  }, [renNetwork, setTargetNetwork, targetNetwork]);
-};
+  }, [renNetwork, setTargetNetwork, targetNetwork])
+}

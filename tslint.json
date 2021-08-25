@@ -9,9 +9,8 @@
     "readonly-array": false,
     "no-let": false,
     "no-object-mutation": false,
-    "no-delete": true,
-    "no-method-signature": true,
     "no-unused-variable": false,
+    "no-unnecessary-initializer": false,
     "jsx-boolean-value": false,
     "no-empty-interface": false,
     "no-empty": false,
@@ -20,6 +19,7 @@
     "no-floating-promises": true,
     "await-promise": true,
     "jsx-no-lambda": false,
+    "no-unsafe-any": false,
     "no-parameter-reassignment": true,
     "function-name": false,
     "variable-name": false,
@@ -29,12 +29,6 @@
     "no-console": false,
     "max-classes-per-file": false,
     "ter-arrow-parens": false,
-    "prefer-array-literal": [
-      true,
-      {
-        "allow-type-parameters": true
-      }
-    ],
     "semicolon": [true, "never"],
     "ordered-imports": false,
     "no-use-before-declare": false,

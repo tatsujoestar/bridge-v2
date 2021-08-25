@@ -1,8 +1,8 @@
-import { Button, useTheme } from "@material-ui/core";
-import React, { FunctionComponent, useCallback, useState } from "react";
-import { ToggleIconButton } from "../../buttons/Buttons";
-import { BitcoinIcon, MetamaskFoxIcon } from "../../icons/RenIcons";
-import { CenteringSpacedBox } from "../../layout/LayoutHelpers";
+import { Button, useTheme } from '@material-ui/core'
+import React, { FunctionComponent, useCallback, useState } from 'react'
+import { ToggleIconButton } from '../../buttons/Buttons'
+import { BitcoinIcon, MetamaskFoxIcon } from '../../icons/RenIcons'
+import { CenteringSpacedBox } from '../../layout/LayoutHelpers'
 import {
   BridgePaper,
   PaperActions,
@@ -10,32 +10,33 @@ import {
   PaperHeader,
   PaperNav,
   PaperTitle,
-} from "../../layout/Paper";
+} from '../../layout/Paper'
 import {
   BigDoneIcon,
   ProgressWithContent,
   TransactionStatusInfo,
-} from "../../progress/ProgressHelpers";
-import { Section } from "../PresentationHelpers";
+} from '../../progress/ProgressHelpers'
+import { Section } from '../PresentationHelpers'
 
-const STEPS = 3;
+const STEPS = 3
 
 export const ProgressSection: FunctionComponent = () => {
-  const [step, setStep] = useState(0);
-  const { customColors, palette } = useTheme();
-  const { orangeDark, orangeLight, skyBlue } = customColors;
+  const [step, setStep] = useState(0)
+  const { customColors, palette } = useTheme()
+  const { orangeDark, orangeLight, skyBlue } = customColors
   const handleNext = useCallback(() => {
-    setStep((step) => (step + 1) % STEPS);
-  }, []);
+    // tslint:disable-next-line: no-shadowed-variable
+    setStep((step) => (step + 1) % STEPS)
+  }, [])
   return (
-    <Section header="Progress Helpers">
+    <Section header='Progress Helpers'>
       <BridgePaper>
         <PaperHeader>
           <PaperNav />
           <PaperTitle>Minting</PaperTitle>
           <PaperActions>
-            <ToggleIconButton variant="notifications" pressed />
-            <ToggleIconButton variant="settings" />
+            <ToggleIconButton variant='notifications' pressed />
+            <ToggleIconButton variant='settings' />
           </PaperActions>
         </PaperHeader>
         <PaperContent>
@@ -46,7 +47,7 @@ export const ProgressSection: FunctionComponent = () => {
               processing={step === 1}
             >
               {step !== 2 ? (
-                <BitcoinIcon fontSize="inherit" color="inherit" />
+                <BitcoinIcon fontSize='inherit' color='inherit' />
               ) : (
                 <BigDoneIcon />
               )}
@@ -60,8 +61,8 @@ export const ProgressSection: FunctionComponent = () => {
             >
               {step !== 2 ? (
                 <TransactionStatusInfo
-                  address="0x7a36479806342F7a1d663fF43A0D340b733FA764"
-                  chain="Binance Smart Chain"
+                  address='0x7a36479806342F7a1d663fF43A0D340b733FA764'
+                  chain='Binance Smart Chain'
                 />
               ) : (
                 <BigDoneIcon />
@@ -75,12 +76,12 @@ export const ProgressSection: FunctionComponent = () => {
               processing={step === 1}
             >
               {step === 0 && (
-                <MetamaskFoxIcon fontSize="inherit" color="inherit" />
+                <MetamaskFoxIcon fontSize='inherit' color='inherit' />
               )}
               {step === 1 && (
                 <TransactionStatusInfo
-                  address="0x7a36479806342F7a1d663fF43A0D340b733FA764"
-                  chain="Ethereum"
+                  address='0x7a36479806342F7a1d663fF43A0D340b733FA764'
+                  chain='Ethereum'
                 />
               )}
               {step === 2 && <BigDoneIcon />}
@@ -88,9 +89,9 @@ export const ProgressSection: FunctionComponent = () => {
           </CenteringSpacedBox>
           <CenteringSpacedBox>
             <Button
-              variant="contained"
-              size="large"
-              color="primary"
+              variant='contained'
+              size='large'
+              color='primary'
               onClick={handleNext}
               fullWidth
             >
@@ -103,14 +104,14 @@ export const ProgressSection: FunctionComponent = () => {
               confirmations={1}
               targetConfirmations={2}
             >
-              <BitcoinIcon fontSize="inherit" color="inherit" />
+              <BitcoinIcon fontSize='inherit' color='inherit' />
             </ProgressWithContent>
             <ProgressWithContent
               color={orangeDark}
               confirmations={2}
               targetConfirmations={6}
             >
-              <BitcoinIcon fontSize="inherit" color="inherit" />
+              <BitcoinIcon fontSize='inherit' color='inherit' />
             </ProgressWithContent>
           </CenteringSpacedBox>
           <CenteringSpacedBox>
@@ -119,18 +120,18 @@ export const ProgressSection: FunctionComponent = () => {
               confirmations={5}
               targetConfirmations={15}
             >
-              <BitcoinIcon fontSize="inherit" color="inherit" />
+              <BitcoinIcon fontSize='inherit' color='inherit' />
             </ProgressWithContent>
             <ProgressWithContent
               color={orangeDark}
               confirmations={20}
               targetConfirmations={200}
             >
-              <BitcoinIcon fontSize="inherit" color="inherit" />
+              <BitcoinIcon fontSize='inherit' color='inherit' />
             </ProgressWithContent>
           </CenteringSpacedBox>
         </PaperContent>
       </BridgePaper>
     </Section>
-  );
-};
+  )
+}

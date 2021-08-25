@@ -1,5 +1,5 @@
 import { Box, Button } from '@material-ui/core'
-import React, { FunctionComponent, useCallback, useState } from "react";
+import React, { FunctionComponent, useCallback, useState } from 'react'
 import {
   BigQrCode,
   CopyContentButton,
@@ -8,27 +8,27 @@ import {
   TransactionDetailsButton,
   TransactionHistoryMenuIconButton,
   TxHistoryIconButton,
-} from "../../buttons/Buttons";
-import { QrCodeIcon } from "../../icons/RenIcons";
-import { Cartesian, Section, SeparationWrapper } from "../PresentationHelpers";
+} from '../../buttons/Buttons'
+import { QrCodeIcon } from '../../icons/RenIcons'
+import { Cartesian, Section, SeparationWrapper } from '../PresentationHelpers'
 
 export const ButtonsSection: FunctionComponent = () => {
-  const [settings, setSettings] = useState(false);
-  const [notifications, setNotifications] = useState(false);
+  const [settings, setSettings] = useState(false)
+  const [notifications, setNotifications] = useState(false)
   const toggleSettings = useCallback(() => {
-    setSettings(!settings);
-  }, [settings]);
+    setSettings(!settings)
+  }, [settings])
   const toggleNotifications = useCallback(() => {
-    setNotifications(!notifications);
-  }, [notifications]);
+    setNotifications(!notifications)
+  }, [notifications])
   return (
     <>
-      <Section header="Buttons">
+      <Section header='Buttons'>
         <SeparationWrapper>
-          <Button variant="contained" color="primary" size="large">
+          <Button variant='contained' color='primary' size='large'>
             Primary Button
           </Button>
-          <Button variant="contained" color="secondary" size="large">
+          <Button variant='contained' color='secondary' size='large'>
             Secondary Button
           </Button>
         </SeparationWrapper>
@@ -37,22 +37,22 @@ export const ButtonsSection: FunctionComponent = () => {
           Wrapper={SeparationWrapper}
           content={(props: any) => `${props.color}`}
           propVariants={{
-            variant: ["contained"],
-            size: ["large", "small"],
-            color: ["primary", "secondary"],
+            variant: ['contained'],
+            size: ['large', 'small'],
+            color: ['primary', 'secondary'],
             disabled: [true, false],
           }}
         />
       </Section>
-      <Section header="Special Buttons">
+      <Section header='Special Buttons'>
         <SeparationWrapper>
           <ToggleIconButton
-            variant="settings"
+            variant='settings'
             pressed={settings}
             onClick={toggleSettings}
           />
           <ToggleIconButton
-            variant="notifications"
+            variant='notifications'
             pressed={notifications}
             onClick={toggleNotifications}
           />
@@ -61,27 +61,25 @@ export const ButtonsSection: FunctionComponent = () => {
           <TransactionHistoryMenuIconButton />
         </SeparationWrapper>
         <SeparationWrapper>
-          <CopyContentButton content="1LU14szcGuMwxVNet1rm1LU14szcGuMwxVNet1rm1LU14szcGuMwxVNet1rm1LU14szcGuMwxVNet1rm" />
-          <CopyContentButton content="" />
+          <CopyContentButton content='1LU14szcGuMwxVNet1rm1LU14szcGuMwxVNet1rm1LU14szcGuMwxVNet1rm1LU14szcGuMwxVNet1rm' />
+          <CopyContentButton content='' />
           <TransactionDetailsButton
-            label="ETH"
-            address="0x7a36479806342F7a1d663fF43A0D340b733FA764"
+            label='ETH'
+            address='0x7a36479806342F7a1d663fF43A0D340b733FA764'
           />
           <br />
           <TransactionDetailsButton
-            label="BTC"
-            address="1LU14szcGuMwxVNet1rm"
+            label='BTC'
+            address='1LU14szcGuMwxVNet1rm'
           />
         </SeparationWrapper>
         <SeparationWrapper>
           <BigQrCode>
-            <QrCodeIcon fontSize="inherit" />
+            <QrCodeIcon fontSize='inherit' />
           </BigQrCode>
         </SeparationWrapper>
-        <Box maxWidth={200}>
-
-        </Box>
+        <Box maxWidth={200}/>
       </Section>
     </>
-  );
-};
+  )
+}
