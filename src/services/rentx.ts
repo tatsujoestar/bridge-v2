@@ -5,7 +5,6 @@ import {
 } from '@renproject/chains-bitcoin'
 import {
   BinanceSmartChain,
-
 } from '@renproject/chains-ethereum'
 import { RenNetwork } from '@renproject/interfaces'
 import { BurnMachineContext, GatewayMachineContext } from '@renproject/ren-tx'
